@@ -1,0 +1,27 @@
+name: Compilar e testar todos os algoritmos
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Compilar e executar cada algoritmo
+        run: |
+          set -e
+          find . -name "*.java" | sort | while read -r f; do
+            dir=$(dirname "$f")
+            class=$(basename "$f" .java)
+            echo "=== $f ==="
+            (cd "$dir" && javac -encoding UTF-8 "$class.java" && java "$class")
+          done
