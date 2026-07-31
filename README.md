@@ -7,18 +7,14 @@ traz pseudocódigo, explicação passo a passo e análise de complexidade, aqui
 você encontra a **implementação real em Java, testada e pronta para
 executar**.
 
-> 📘 Este repositório segue o modelo definido na Seção 2 do *Relatório
-> Técnico de Ajustes da Apostila*: os pseudocódigos permanecem na apostila;
-> as implementações completas (com classe de teste, exemplos de entrada e
-> saída e instruções de execução) ficam aqui, versionadas.
-
 ## Como usar este repositório
 
 Cada algoritmo vive em sua própria pasta, autocontida, com:
 
 - **um `.java`** (nome = nome do algoritmo, ex.: `MergeSort.java`) —
-  implementação + método `main` com exemplo de entrada/saída e verificações
-  automáticas;
+  implementação do algoritmo e um método `main` que demonstra o processo
+  passo a passo com um exemplo de entrada, seguido de verificações de
+  corretude silenciosas (`assert`);
 - **`README.md`** — complexidade (tempo/espaço), pré-condições,
   limitações e referência à seção correspondente da apostila.
 
@@ -41,16 +37,37 @@ java MergeSort
 Saída esperada (resumida):
 
 ```
-Entrada:  [6, 3, 5, 1, 8, 2, 4, 7]
-Ordenado: [1, 2, 3, 4, 5, 6, 7, 8]
-  [OK] resultado ordenado
-  [OK] resultado == [1..8]
-  ...
-Todos os testes passaram.
+▸ Merge Sort
+────────────────────────────────────────
+Entrada  [6, 3, 5, 1, 8, 2, 4, 7]
+
+  [6, 3, 5, 1, 8, 2, 4, 7]
+    [6, 3, 5, 1]
+      [6, 3]
+      -> [3, 6]
+      ...
+    -> [1, 3, 5, 6]
+    ...
+  -> [1, 2, 3, 4, 5, 6, 7, 8]
+
+Ordenado [1, 2, 3, 4, 5, 6, 7, 8]
 ```
 
-O programa termina com código de saída `0` se todas as verificações
-passarem, e `1` caso alguma falhe — o que permite usá-lo em scripts de CI.
+Cada `main` demonstra o algoritmo executando de verdade sobre um exemplo
+(em geral, o mesmo usado na apostila), e não apenas imprime um resultado
+final. Internamente, os cenários relevantes (vetor vazio, um elemento,
+pior caso, elementos repetidos etc.) são checados com `assert`, que não
+produz nenhuma saída quando tudo está correto. Para ativar essas
+verificações explicitamente:
+
+```bash
+java -ea MergeSort
+```
+
+Com `-ea`, qualquer inconsistência interrompe a execução com
+`AssertionError` — útil para validar o repositório antes de uma aula ou
+em um script de CI. Sem `-ea` (uso normal), os `assert` são ignorados e o
+programa apenas roda a demonstração.
 
 ### Executando tudo de uma vez
 
@@ -58,7 +75,7 @@ passarem, e `1` caso alguma falhe — o que permite usá-lo em scripts de CI.
 find . -name "*.java" | while read -r f; do
   dir=$(dirname "$f"); class=$(basename "$f" .java)
   echo "== $f =="
-  (cd "$dir" && javac -encoding UTF-8 "$class.java" && java "$class") || exit 1
+  (cd "$dir" && javac -encoding UTF-8 "$class.java" && java -ea "$class") || exit 1
 done
 ```
 
@@ -68,6 +85,8 @@ done
 Construcao-Analise-Algoritmos/
 ├── README.md                                   (este arquivo)
 ├── LICENSE
+├── .gitignore
+├── .github/workflows/test.yml                  (CI: compila e roda tudo a cada push)
 ├── unidade-2-pesquisa-ordenacao/
 │   ├── busca-linear-binaria/
 │   ├── insertion-sort/
@@ -104,10 +123,10 @@ completa"** na apostila, que aponta para o caminho
   StandardCharsets.UTF_8))` no início de cada `main` para garantir a
   exibição correta de acentuação, independentemente da *locale*/codificação
   do sistema operacional onde o código é executado;
-- Verificações automáticas escritas manualmente (sem JUnit), para manter o
-  repositório sem dependências: cada `checar(nome, condição)` imprime
-  `[OK]`/`[FALHOU]` e o programa encerra com código de saída `1` se algo
-  falhar.
+- Corretude verificada com `assert` (nativo do Java, sem dependências): a
+  saída no console fica dedicada à demonstração do algoritmo, e as
+  verificações só se manifestam (com `AssertionError`) se algo estiver
+  errado e o programa for executado com `-ea`.
 
 ## Convenção de índices: 0-based (Java) × 1-based (apostila)
 
@@ -147,4 +166,3 @@ Prof. Pedro Gabriel Calíope Dantas Pinheiro — Curso de Ciência da
 Computação. Contribuições de estudantes são bem-vindas via *pull request*
 (correções de bugs, testes adicionais, documentação); alterações no
 comportamento dos algoritmos exigem revisão do professor antes do merge.
-#
